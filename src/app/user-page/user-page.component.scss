@@ -1,0 +1,59 @@
+#logOut{
+  display: inline-flex;
+  margin-left: 30em;
+}
+#navbar{
+  height: 55px;
+}
+#filter{
+  margin-top: 0px;
+  height: 35px;
+}
+#inbox:hover, #sent:hover, #starred:hover, #important:hover,
+#others:hover, #draft:hover, #deleted:hover, #contacts:hover{
+  background-color: darkgrey;
+}
+#messagelist{
+  padding-top: 10px;
+  padding-left: 20px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: gray;
+  bottom: -20px;
+}
+#messagelist:hover{
+  background-color: darkgrey;
+  padding-left: 30px;
+}
+#ContactsList:hover{
+  background-color: darkgrey;
+  margin-left: 30px;
+}
+#check:checked, #check2:checked{
+  background-color: black;
+  border-color: black;
+}
+#check, #check2{
+  cursor: pointer;
+}
+#showMessage{
+  padding-left: 20px;
+  text-align: left;
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 2px 2px grey;
+  width: 500px;
+  min-height: fit-content;
+  position: absolute;
+  top:-40px;
+  left: 265px;
+  border-radius: 5px;
+  padding-top: 10px;
+  display: flex;
+  visibility: hidden;
+}
+#options{
+  opacity: 85%;
+}
+.file-input{
+  display: none;
+}

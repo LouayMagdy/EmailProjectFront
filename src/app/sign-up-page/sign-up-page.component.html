@@ -1,0 +1,57 @@
+<!-- Latest compiled and minified CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<div id="register-login" style="margin-top: 80px">
+  <div class="nav justify-content-center">
+    <h2>Welcome To <span class="badge rounded-pill bg-secondary">Email</span></h2>
+  </div>
+  <div class="text-center">
+    <div class="btn-group">
+      <button type="button" class="btn btn-secondary" style="width: 250px">
+        <a class="navbar-brand" routerLink="/logger" style="color: white"> LOG-IN </a>
+      </button>
+      <button type="button" class="btn btn-dark" style="width: 250px">
+        <a class="navbar-brand" routerLink="/sign-up" style="color: white"> SIGN-UP </a>
+      </button>
+    </div>
+
+    <div class="mb-3 mt-3" style="width: 500px; margin-left: 190px">
+      <label for="userName" class="form-label">Username:</label>
+      <input type="text" class="form-control" id="userName" placeholder="Enter your name" name="" (keyup)="setName($event)">
+    </div>
+
+    <div class="mb-3 mt-3" style="width: 500px; margin-left: 190px">
+      <label for="email" class="form-label">Email:</label>
+      <input type="email" class="form-control" id="email" placeholder="Enter email" name="" (keyup)="setEmail($event)">
+    </div>
+
+    <div class="mb-3" style="width: 500px; margin-left: 190px">
+      <label for="pwd" class="form-label">Password:</label>
+      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="" (keyup)="setPassword($event)">
+    </div>
+
+    <div class="mb-3" style="width: 500px; margin-left: 190px">
+      <label for="confirmPassword" class="form-label">Confirm Password:</label>
+      <input type="password" class="form-control" id="confirmPassword" placeholder="Re-Enter password" name="" (keyup)="confirmPassword($event)">
+    </div>
+
+    <button type="button" id="createAccount" class="btn btn-success mb-3 mt-3" style="width: 250px"
+           (click)="start()"disabled>
+      <a class="navbar-brand"  style="color: white" >Create An Account</a>
+    </button>
+    </div>
+</div>
+<div id="getStarted">
+  <p *ngIf="status1 == true">Account Created Successfully</p>
+  <p *ngIf="status1 == false">Sorry, This Account is already Present...Try To Change Email Address!</p>
+  <button class="btn btn-success" *ngIf="status1 == true" routerLink="/logger">
+    Get Started
+  </button>
+  <button class="btn btn-success" *ngIf="status1 == false" (click)="getStarted()" routerLink="/sign-up">
+    Try Again
+  </button>
+</div>
+

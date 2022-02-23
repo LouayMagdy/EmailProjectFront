@@ -1,0 +1,416 @@
+<!-- Latest compiled and minified CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark"
+     id="navbar" style="box-shadow: 1px 1px 1px 1px grey">
+  <div class="container-fluid">
+
+    <a class="navbar-brand" routerLink="user-page" style="color: white; font-size: 25px" >
+      <span class="badge rounded-pill bg-secondary">Email</span>
+    </a>
+
+    <div class="collapse navbar-collapse" id="mynavbar">
+
+      <form class="d-flex" style="padding-top: 10px; margin-top: -5px">
+        <input class="rounded-pill form-control me-2" type="text" *ngIf="currentCategory != 'Contacts'"
+               placeholder="Search For A Mail" style="min-width: 250px; height: 35px"
+                (keyup)="nonFilteredSearch($event); displayMessages();">
+        <input class="rounded-pill form-control me-2" type="text" *ngIf="currentCategory == 'Contacts'"
+               placeholder="Search For A Contact " style="min-width: 250px; height: 35px"
+               (keyup)="searchAllContacts($event); displayUsers()">
+
+        <button class="btn rounded-pill btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                type="button" id="filter" style="width: 150px" (click)="filterButtonClicked()" *ngIf="currentCategory != 'Contacts'">
+          Filters <i class="fa fa-filter" style="font-size:20px; color:white"></i>
+        </button>
+      </form>
+      <div id="logOut">
+        <button class="btn rounded-pill btn-danger" type="button" (click)="logOut()" routerLink="/logger">
+          Log-Out <i class="fa fa-sign-out" style="font-size:20px"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div id="sideNavAndBody" style="display: flex">
+  <div id="sideNav" class="justify-content-left bg-dark"
+       style="width: 200px; height: 634px; box-shadow: 2px 2px 2px 2px grey">
+    <ul class="nav flex-column bg-dark" style="padding-left: -20px; padding-top: 40px; cursor: pointer">
+      <div id="compose" style="padding-bottom: 40px">
+        <button class="btn rounded-pill btn-secondary" type="button" (click)="composeButtonClicked()" >
+          <i class="fa fa-paper-plane-o"></i> Compose </button>
+      </div>
+      <li class="nav-item" id="inbox"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link" style="color: white" (click)="getInbox(); displayMessages()">
+          <i class="fa fa-envelope-o" style="color:white;"></i> Inbox</a>
+      </li>
+      <li class="nav-item" id="sent"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link" style="color: white" (click)="getSent(); displayMessages()">
+          <i class="fa fa-location-arrow" style="color: white"></i> Sent</a>
+      </li>
+      <li class="nav-item" id="starred"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link" style="color: white" (click)="getStarred(); displayMessages()">
+          <i class="fa fa-star" style="color: white"></i> Starred</a>
+      </li>
+      <li class="nav-item" id="important"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link "  style="color: white" (click)="getImportant(); displayMessages()">
+          <i class="fa fa-suitcase" style="color: white"></i> Important</a>
+      </li>
+      <li class="nav-item" id="draft"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link "  style="color: white" (click)="getDraft(); displayMessages()">
+          <i class="fa fa-sticky-note" style="color: white"></i> Drafts</a>
+      </li>
+      <li class="nav-item" id="deleted"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px">
+        <a class="nav-link "  style="color: white" (click)="getTrashed(); displayMessages()">
+          <i class="fa fa-recycle" style="color: white"></i> Trashed</a>
+      </li>
+      <li class="nav-item" id="others"
+          style="border-bottom: grey; border-bottom-style: solid; border-bottom-width: 1px" (click)="getCustom(); displayMessages()">
+        <a class="nav-link "  style="color: white">
+          <i class="fa fa-folder-open-o"></i> Others</a>
+      </li>
+      <li class="nav-item" id="contacts" (click)="selectContacts(); getMyContacts(); displayUsers()">
+        <a class="nav-link "  style="color: white">
+          <i class="fa fa-address-book-o" style="color: white"></i> Contacts</a>
+      </li>
+    </ul>
+  </div>
+  <div id="body" style="position: absolute; margin-left: 210px; margin-top: 0px;">
+    <div id="showMessages" style="position: absolute; margin-left: -4px; margin-top: 3px;
+    width: 1070px; height: 630px; background: whitesmoke">
+      <div id="pagination" class="btn-group justify-content-center" style="top: -50px">
+        <button class="btn btn-secondary" id="dec" (click)="decrementPage(); displayMessages()"> << Previous </button>
+        <button class="btn btn-secondary" disabled>{{currentPage}}</button>
+        <button class="btn btn-secondary" id="inc" (click)="incrementPage(); displayMessages()"> Next >> </button>
+      </div>
+      <div id="messages" style="background: lightgray; position: absolute; width: 1070px;
+          height: 580px; margin-top: -100px; border-radius: 5px">
+        <label class="justify-content-center" style="font-size: 24px;
+                   margin-left: -40px; font-weight: bold">{{currentCategory}}</label>
+        <div id="messagelist" *ngFor="let i of messagesToAppear"
+             style="font-size: 16px; text-align: left; display: flex;">
+          <div (click)="showMessage(i)" style=" cursor: pointer">
+            <p><span style="font-weight: bold;
+              font-style: italic">From: </span> {{i.from}}</p>
+            <p><span style="font-weight: bold;
+              font-style: italic">To: </span>{{i.to}}</p>
+            <p><span style="font-weight: bold">Subject:</span> {{i.subject}}</p>
+            <p style="display: inline-block; width: 200px; white-space: nowrap;
+          overflow: hidden !important; text-overflow: ellipsis; font-size: 14px;"> : {{i.body}}</p>
+          </div>
+          <div (click)="showMessage(i)" style=" cursor: pointer">
+            <p><span style="font-weight: bold; font-style: italic;">Date: </span> {{i.date}}</p>
+          </div>
+          <div class="form-check" style="padding-left: 400px; display: block">
+            <div style="display: flex">
+              <input type="checkbox" class="form-check-input" id="check" name="option2"
+                     (click)="markMessages(i)" *ngIf="messagesMarked.includes(i.iD)" checked>
+              <input type="checkbox" class="form-check-input" id="check2" name="option2"
+                     (click)="markMessages(i)" *ngIf="!(messagesMarked.includes(i.iD))">
+              <label class="form-check-label" for="check" style="padding-left: 10px">Select Mail</label>
+              <label *ngIf="i.read == false && currentCategory == 'Inbox'" style="padding-left: 20px">
+                <span class="badge rounded-pill bg-danger">New !</span>
+              </label>
+            </div>
+            <button type="button" id="recompose" class="btn btn-success" style="margin-left: -23px"
+            *ngIf="currentCategory=='Drafts'" (click)="recomposeMessage(i)">
+              Re-Compose <i class="fa fa-pencil-square-o" style="color: white" ></i>
+            </button>
+            <button type="submit" id="unstar" class="btn btn-danger" style="margin-left: -23px"
+            *ngIf="currentCategory == 'Starred'" (click)="unStarMessage(i.iD)">
+              Unstar <i class="fa fa-star-half-full" style="color: gold"></i>
+            </button>
+            <button type="submit" id="unimportant" class="btn btn-danger" style="margin-left: -23px"
+                    *ngIf="currentCategory == 'Important'" (click)="unImportantMessage(i.iD)">
+              make UnImportant <i class="fa fa-suitcase" style="color: white"></i>
+            </button>
+            <button type="submit" id="uncustom" class="btn btn-danger" style="margin-left: -23px"
+                    *ngIf="currentCategory == 'Other Messages'" (click)="unCustomMessage(i.iD)">
+              Remove From Others <i class="fa fa-folder-open" style="color: white"></i>
+            </button>
+
+
+          </div>
+
+        </div>
+
+        <div id="showMessage">
+          <div>
+            <p><span style="font-weight: bold;
+              font-style: italic">From: </span> {{message.getFrom()}} </p>
+            <p><span style="font-weight: bold;
+              font-style: italic">To: </span>{{message.getTo()}}</p>
+            <p><span style="font-weight: bold">Subject: </span>{{message.getSubject()}}</p>
+            <p><span style="font-weight: bold">Body:</span></p>
+            <p>{{message.getBody()}}</p>
+            <p><span style="font-weight: bold">Attachemnt: </span>
+              <button class="btn btn-outline-dark" type="button" id="attachmentSent" style="margin-left: 10px;"
+              *ngIf="message.getAttachment() != '' ">
+                <a style="color: black; text-decoration: none" [href]="message.getAttachment()" download>
+                  Attachment
+                </a>
+              </button>
+
+            <p><span style="font-weight: bold; font-style: italic;">Date: </span>{{message.getDate()}}</p>
+          </div>
+          <div style="left: 450px; position: absolute; cursor: pointer; "
+               (click)="xButtonClicked()">
+            <i class="fa fa-times-rectangle-o" style="color: darkred;"></i>
+          </div>
+
+        </div>
+
+        <div id="composeAMessage" style="position: absolute; margin-left: -5px; margin-top: 0px;
+    background: whitesmoke; width: 700px; height: 550px; border-radius: 0.5em; top:-40px; left: 150px;
+    box-shadow: 2px 2px 2px 2px grey; visibility: hidden">
+          <form style="text-align: left; padding-top: 10px; padding-left: 5px">
+            <div id="toC" style="display: flex; margin-top: 5px">
+              <label for="toFilterC" style="padding-top: 7px">To: </label>
+              <input type="email" id="toFilterC" class="form-control"
+              placeholder="                                                                @Email.com" name=""
+              style="margin-right: 10px; margin-left: 30px;" (keyup)="setTo($event)">
+            </div>
+            <div id="subjectC" style="display: flex; margin-top: 5px">
+              <label for="subFilterC" style="padding-top: 7px">Subject: </label>
+              <input type="text" id="subFilterC" class="form-control"
+                 placeholder="subject" name=""
+                 style="margin-right: 10px; margin-left: 8px;" (keyup)="setSubject($event)">
+            </div>
+            <div id="emailBodyC" style="display: flex; margin-top: 5px">
+              <label for="bodyFilterC" style="padding-top: 7px">Body: </label>
+              <textarea id="bodyFilterC" class="form-control"
+                    placeholder="type something" name=""
+                    style="margin-right: 10px; margin-left: 10px; max-height: 300px;
+                    min-height: 300px" (keyup)="setBody($event)"></textarea>
+            </div>
+            <div id="attachIconC" style="display: flex; margin-top: 15px">
+
+              <label for="bodyFilterC" style="padding-top: 7px">Attachment: </label>
+              <button class="btn btn-outline-dark" type="button" id="attachment" style="margin-left: 10px;"  disabled>
+                <a style="color: black; text-decoration: none" [href]="filePath" download>
+                  {{fileName || "No file uploaded yet. "}}
+                </a>
+              </button>
+              <button type="button" class="btn btn-danger" id="cancelAttachment" (click)="cancelAttachment()"
+                      style="width: 25px; height: 25px; margin-top: 8px; padding-top:0px; padding-left: 4px; visibility: hidden">
+                <i class="fa fa-times-circle-o" style="color: white;"></i>
+              </button>
+
+              <input type="file" class="file-input"
+                     (change)="selectAnAttachment($event)" #fileUpload>
+              <div class="file-upload" style="padding-left: 10px">
+                <button class="btn rounded-pill btn-dark" style="box-shadow: 1px 1px 1px 1px grey" type="button"
+                (click)="fileUpload.click()">
+                  <i class="material-icons" style="color: white; padding-top: 4px">attachment</i>
+                </button>
+              </div>
+
+
+            </div>
+            <div id="finalDecisionC" style="display: flex; margin-top: 35px">
+              <button class="btn btn-danger" style="margin-left: 100px" type="submit"
+              (click)="cancelButtonClicked()">Cancel</button>
+              <button class="btn btn-warning" style="margin-left: 200px" type="submit"
+              (click)="finalDecisionOnEmail('draft');cancelButtonClicked();">Save As Draft</button>
+              <button class="btn btn-success" style="margin-left: 100px" type="submit"
+              (click)="finalDecisionOnEmail('send');cancelButtonClicked()">Send</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="recomposeAMessage" style="position: absolute; margin-left: -5px; margin-top: 0px;
+    background: whitesmoke; width: 700px; height: 550px; border-radius: 0.5em; top:-40px; left: 150px;
+    box-shadow: 2px 2px 2px 2px grey; visibility: hidden">
+          <form style="text-align: left; padding-top: 10px; padding-left: 5px">
+            <div id="toReC" style="display: flex; margin-top: 5px">
+              <label for="toFilterC" style="padding-top: 7px">To: </label>
+              <input type="email" id="toFilterReC" class="form-control"
+                     [placeholder]="message.getTo()" [value]="message.getTo()" name=""
+                     style="margin-right: 10px; margin-left: 30px;" (keyup)="setTo($event)">
+            </div>
+            <div id="subjectReC" style="display: flex; margin-top: 5px">
+              <label for="subFilterC" style="padding-top: 7px">Subject: </label>
+              <input type="text" id="subFilterReC" class="form-control"
+                     [placeholder]="message.getSubject()" [value]="message.getSubject()" name=""
+                     style="margin-right: 10px; margin-left: 8px;" (keyup)="setSubject($event)">
+            </div>
+            <div id="emailBodyReC" style="display: flex; margin-top: 5px">
+              <label for="bodyFilterC" style="padding-top: 7px">Body: </label>
+              <textarea id="bodyFilterReC" class="form-control"
+                        [placeholder]="message.getBody()" [value]="message.getBody()" name=""
+                        style="margin-right: 10px; margin-left: 10px; max-height: 300px;
+                    min-height: 300px" (keyup)="setBody($event)"></textarea>
+            </div>
+            <div id="attachIconReC" style="display: flex; margin-top: 15px">
+
+              <label for="bodyFilterC" style="padding-top: 7px">Attachment: </label>
+              <button class="btn btn-outline-dark" type="button" id="attachmentRec" style="margin-left: 10px;" disabled>
+                <a style="color: black; text-decoration: none" [href]="filePath" download>
+                  {{fileName || "No file uploaded yet."}}
+                </a>
+              </button>
+              <button type="button" class="btn btn-danger" id="cancelAttachmentRec" (click)="cancelAttachment()"
+                      style="width: 25px; height: 25px; margin-top: 8px; padding-top:0px; padding-left: 4px;"
+              *ngIf="filePath != ''">
+                <i class="fa fa-times-circle-o" style="color: white;"></i>
+              </button>
+
+              <input type="file" class="file-input"
+                     (change)="selectAnAttachment($event)" #fileUpload>
+              <div class="file-upload" style="padding-left: 10px">
+                <button class="btn rounded-pill btn-dark" style="box-shadow: 1px 1px 1px 1px grey" type="button"
+                        (click)="fileUpload.click()">
+                  <i class="material-icons" style="color: white; padding-top: 4px">attachment</i>
+                </button>
+              </div>
+
+
+            </div>
+            <div id="finalDecisionReC" style="display: flex; margin-top: 35px">
+              <button class="btn btn-danger" style="margin-left: 100px" type="submit"
+                      (click)="cancelButtonClicked()">Cancel</button>
+              <button class="btn btn-warning" style="margin-left: 200px" type="submit"
+                      (click)="finalDecisionOnEmail('draft');cancelButtonClicked();">Save As Draft</button>
+              <button class="btn btn-success" style="margin-left: 100px" type="submit"
+                      (click)="finalDecisionOnEmail('send');cancelButtonClicked()">Send</button>
+            </div>
+          </form>
+        </div>
+
+
+      </div>
+      <div id="options" class="btn-group-vertical" style="left: 400px; top: 160px;">
+        <button type="submit" class="btn btn-secondary" (click)="starMessages()">
+          <i class="fa fa-star" style="color: gold"></i>
+        </button>
+        <button type="submit" class="btn btn-secondary" (click)="makeMessagesImportant()">
+          <i class="fa fa-suitcase" style="color: black"></i>
+        </button>
+        <button type="submit" class="btn btn-secondary" (click)="deleteMessages()">
+          <i class="fa fa-recycle" style="color: greenyellow"></i>
+        </button>
+        <button type="submit" class="btn btn-secondary" (click)="makeMessagesCustom()">
+          <i class="fa fa-folder-open-o" style="color: gold"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="filterMessage" style="position: absolute; margin-left: -5px; margin-top: 0px;
+    background: whitesmoke; width: 500px; height: 300px; border-radius: 0.5em; visibility: hidden;
+    box-shadow: 2px 2px 2px 2px grey">
+      <form style="text-align: left; padding-top: 10px; padding-left: 5px">
+        <div id="from" style="display: flex; margin-top: auto">
+          <label for="fromFilter" style="padding-top: 7px;">From: </label>
+          <input type="email" id="fromFilter" class="form-control"
+          placeholder="                                                                @Email.com" name=""
+          style="margin-right: 10px; margin-left: 10px;" (keyup)="setFrom($event)">
+        </div>
+        <div id="to" style="display: flex; margin-top: 5px">
+          <label for="toFilter" style="padding-top: 7px">To: </label>
+          <input type="email" id="toFilter" class="form-control"
+                 placeholder="                                                                @Email.com" name=""
+                 style="margin-right: 10px; margin-left: 30px;" (keyup)="setTo($event); displayMessages()">
+        </div>
+        <div id="subject" style="display: flex; margin-top: 5px">
+          <label for="subFilter" style="padding-top: 7px">Subject: </label>
+          <input type="text" id="subFilter" class="form-control"
+                 placeholder="subject" name=""
+                 style="margin-right: 10px; margin-left: 8px;" (keyup)="setSubject($event)">
+        </div>
+        <div id="date" style="display: flex; margin-top: 5px">
+          <label for="dateFilter" style="padding-top: 7px">Date: </label>
+          <input type="text" id="dateFilter" class="form-control"
+                 placeholder="hour, day, month, or year" name=""
+                 style="margin-right: 10px; margin-left: 10px;" (keyup)="setDate($event)">
+        </div>
+        <div id="emailBody" style="display: flex; margin-top: 5px">
+          <label for="bodyFilter" style="padding-top: 7px">Body: </label>
+          <textarea id="bodyFilter" class="form-control"
+                 placeholder="enter any word/sentence in the email body" name=""
+                 style="margin-right: 10px; margin-left: 10px; max-height: 100px;" (keyup)="setBody($event)"></textarea>
+        </div>
+        <div id="submit" style="padding-left: 200px; padding-top: 10px">
+          <button type="button" class="btn btn-success" (click)="filteredSearch(); displayMessages()">
+            Search <i class="fa fa-search"></i></button>
+        </div>
+      </form>
+    </div>
+
+    <div id="contactsW" style="position: absolute; margin-left: -4px; margin-top: 4px;
+    width: 1070px; height: 630px; background: whitesmoke" *ngIf="currentCategory == 'Contacts'">
+      <div id="secNavBar" class="justify-content-center" style="display: flex; background:lightgray; padding-top: 7px;
+      padding-bottom: 7px; padding-left: 50px; margin-top: 2px; margin-left: 0px">
+        <input class="rounded-pill form-control me-2" type="text"
+               placeholder="Search Your Contacts " (keyup)="searchMyContacts($event); displayUsers();"
+               style="min-width: 250px; max-width: 250px ;height: 35px; margin-right: 20px">
+        <label id="ContactOperation"
+               style="padding-top: 3px; margin-left: 20px; font-size: 20px; font-weight: bold">
+          Contacts: {{contactsCategory}}
+        </label>
+        <div id="paginationC" class="btn-group justify-content-center" style="margin-left: 15px">
+          <button class="btn btn-secondary" id="decC" (click)="decrementPage();"> << Previous </button>
+          <button class="btn btn-secondary" disabled>{{currentPage}}</button>
+          <button class="btn btn-secondary" id="incC" (click)="incrementPage();"> Next >> </button>
+        </div>
+      </div>
+      <div id="showContacts"
+           style="background: lightgray; position: absolute; width: 1070px;
+          height: 570px; margin-top: 3px; border-radius: 5px">
+        <div id="ContactsList" *ngFor="let j of usersToAppear"
+             style="font-size: 16px; text-align: left; display: flex; padding-top: 10px;
+              padding-bottom: 10px; padding-left: 10px; border-bottom-color: black;
+               border-bottom-width: 1px; border-bottom-style: solid">
+          <div style="display: block">
+            <p><span style="font-weight: bold;font-style: italic">Name: </span> {{j.name }}</p>
+            <p><span style="font-weight: bold;font-style: italic">Mail: </span> {{j.emailAddress}} </p>
+          </div>
+          <div style="display: flex; margin-left: 400px" >
+            <button class="btn btn-warning" style="height: fit-content" (click)="editButtonClicked(j)"
+                    *ngIf="contactsType == 'Your Contacts' || contactsType == 'Search Results from Contacts'">
+              Edit Contact <i class="fa fa-pencil"></i>
+            </button>
+            <button class="btn btn-danger" style="height: fit-content; margin-left: 5px" (click)="deleteContact(j)"
+                    *ngIf="contactsType == 'Your Contacts' || contactsType == 'Search Results from Contacts'">
+              Delete Contact <i class="fa fa-user-times"></i>
+            </button>
+            <button class="btn btn-success" style="height: fit-content; margin-left: 5px" (click)="addContact(j)"
+                    *ngIf="contactsType != 'Your Contacts' && contactsType != 'Search Results from Contacts' ">
+              Add Contact <i class="fa fa-user-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div id="editContact" class="justify-content-center"
+             style="position: absolute; margin-left: 300px; background: darkgrey;visibility: hidden;
+              height: fit-content; padding: 10px 10px 10px 10px ; border-radius: 5px; margin-top: 100px">
+          <label id="newNameL" for="newName">
+            New Name:
+          </label>
+          <input type="text" id="newName" class="form-control" (keyup)="setNewName($event)">
+          <div>
+            <button class="btn btn-danger" style="margin-top: 10px" (click)="cancelEditClicked()">Cancel</button>
+            <button class="btn btn-success" style="margin-top: 10px; margin-left: 10px"
+                    (click)="editContact(); cancelEditClicked()">Change</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
